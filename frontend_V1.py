@@ -1,7 +1,6 @@
 import base64
 import io
 import pathlib
-#from jupyter_dash import JupyterDash
 
 import dash_bootstrap_components as dbc
 import dash
@@ -22,7 +21,7 @@ import os
 
 
 df_orig = pd.read_csv("datos_con_coordenadas_v1 (1).csv", compression='gzip', low_memory=False)
-df = df_orig.copy()
+df = df_orig.copy() 
 
 def set_mes_number(x):
     mes_dic = {'Enero 2019':1, 'Abril 2019':4, 'Mayo 2019':5, 'Noviembre 2019':11,
@@ -34,6 +33,8 @@ def set_mes_number(x):
     return mes_dic[x]
     
 df['mes_number'] = df['MES'].apply(set_mes_number)
+
+# Se agregó una columna mes_number que indica el número exacto del mes entre 1 y 20 para los 20 meses usados
 
 df_top_ventas = df[df['Region']=='region cali'][['Cantidad de pedido','Pedido','Valor Unitario Pedido', 'UM', 'Nombre Fabricante', 'NOMBRE SUB','Valor TotalFactura','Nombre Material']].groupby('Nombre Material', as_index=False).agg({
         'Cantidad de pedido':'sum', 
@@ -74,32 +75,60 @@ mini_container = {
 
 df_temp = df_top_ventas_cantidad.copy()
 
-card2 =    dbc.Card([
-            dbc.CardHeader("Recomendación # 2"),
-            dbc.CardBody([
-                    html.H5(children="Subcategoria: "+ str(df_temp.loc[0,'NOMBRE SUB']).capitalize() , className="card-title", id='rec1-subcategoria1'),
-                    html.H6(children=str(df_temp.loc[0,'Nombre Material']).capitalize(), className="card-subtitle", id='rec1-producto1'),
-                    html.P(children="Fabricante: " + str(df_temp.loc[0,'Nombre Fabricante']).capitalize() , className="card-text", id='rec1-fabricante1'),
-            ])],
-          style={"width": "15rem"}, color='info', outline=True)
+## --------------- Esta es la configuración de los Cuadros de recomendación de productos populares
 
-card=   dbc.Card([
-            dbc.CardHeader("Recomendación # 1"),
-            dbc.CardBody([
-                    html.H4("Subcategoria: Aseo", className="card-title"),
-                    html.H6("Blanqueador Limpido", className="card-subtitle"),
-                    html.P("Fabricante: JGB", className="card-text"),
-            ])],
-        style={"width": "14rem"}, color='info', outline=True)
+lista_cards2 = []
+list_of_outputs_pop_prod = []
 
-lista=  dbc.Row(
-            [
-                dbc.Col(card),
-                dbc.Col(card),
-                dbc.Col(card),
-                dbc.Col(card),
-            ],
-            className="mb-2",)
+for i in range(10):
+  lista_cards2.append(dbc.Card([
+    dbc.CardHeader(f"Recomendación # {i+1}"),
+    dbc.CardBody([
+      html.H5(children="Subcategoria: "+ str(df_temp.loc[i,'NOMBRE SUB']).capitalize() , className="card-title", id=f'rec{i+1}-subcategoria{i+1}'),
+      html.H6(children=str(df_temp.loc[i,'Nombre Material']).capitalize(), className="card-subtitle", id=f'rec{i+1}-producto{i+1}'),
+      html.P(children="Fabricante: " + str(df_temp.loc[i,'Nombre Fabricante']).capitalize() , className="card-text", id=f'rec{i+1}-fabricante{i+1}'),
+      ])],
+    style={"width": "15rem"}, color='info', outline=True))
+
+  list_of_outputs_pop_prod.append(Output(component_id=f'rec{i+1}-subcategoria{i+1}',component_property="children"))
+  list_of_outputs_pop_prod.append(Output(component_id=f'rec{i+1}-producto{i+1}',component_property="children"))
+  list_of_outputs_pop_prod.append(Output(component_id=f'rec{i+1}-fabricante{i+1}',component_property="children"))
+
+list_of_outputs_pop_prod.append(Output(component_id='Tabla_top', component_property="children"))
+
+# card=   dbc.Card([
+#             dbc.CardHeader("Recomendación # 1"),
+#             dbc.CardBody([
+#                     html.H4("Subcategoria: Aseo", className="card-title"),
+#                     html.H6("Blanqueador Limpido", className="card-subtitle"),
+#                     html.P("Fabricante: JGB", className="card-text"),
+#             ])],
+#         style={"width": "14rem"}, color='info', outline=True)
+
+lista1=  dbc.Row(
+  [
+  dbc.Col(lista_cards2[0]),
+  dbc.Col(lista_cards2[1]),
+  dbc.Col(lista_cards2[2]),
+  dbc.Col(lista_cards2[3]),
+  ],
+  className="mb-2",)
+
+lista2=  dbc.Row(
+  [
+  dbc.Col(lista_cards2[4]),
+  dbc.Col(lista_cards2[5]),
+  dbc.Col(lista_cards2[6]),
+  dbc.Col(lista_cards2[7]),
+  ],
+  className="mb-2_1",)
+
+lista3=  dbc.Row(
+  [
+  dbc.Col(lista_cards2[8]),
+  dbc.Col(lista_cards2[9]),
+  ],
+  className="mb-2_1",)
 
 br = html.Br()
 
@@ -253,7 +282,7 @@ app.layout = html.Div(children=[
 
             
                 
-                br, lista, br, lista, card2,
+                br, lista1, br, lista2, br, lista3
                       
             ]),
            
@@ -319,8 +348,6 @@ app.layout = html.Div(children=[
 @app.callback(
     
         Output(component_id="grafico_1",component_property="figure"),
-
-    
     [
         Input(component_id="dropdown_tienda", component_property="value"),
         Input(component_id="menu_grafico_1", component_property="value"),
@@ -386,13 +413,23 @@ def grafico_mapa(input_tienda):
     #center_lat = tiendas_df.latitude.mean()
     #center_lon = tiendas_df.longitude.mean()
     
-    tiendas_df = df[df['Region']=='region cali'][['longitude','latitude','lealtad','Tienda','Nombre Tienda']].groupby('Nombre Tienda', as_index=False).max()
+    tiendas_df = df[['longitude','latitude','lealtad','Tienda','Nombre Tienda']].groupby('Nombre Tienda', as_index=False).max()
+    print(input_tienda)
     center_lat = tiendas_df[tiendas_df['Tienda'] == int(input_tienda)]['latitude'].mean()
     center_lon = tiendas_df[tiendas_df['Tienda'] == int(input_tienda)]['longitude'].mean()
+
+    print(center_lat, ',', center_lon)
     
     map_box_access_token = "pk.eyJ1IjoiaHVtYmVydG9jcnYiLCJhIjoiY2tnbG5xZWpyMTJhdzJycGVyamZma2FjYyJ9.juzkmatkYaLTmiprDJCD0w"
     px.set_mapbox_access_token(map_box_access_token)
-    fig_map = px.scatter_mapbox(tiendas_df, center=go.layout.mapbox.Center(lat=center_lat, lon=center_lon), lat='latitude', lon='longitude',   color="lealtad", color_continuous_scale=px.colors.cyclical.IceFire, hover_name="Nombre Tienda", size_max=100, zoom=18)
+    fig_map = px.scatter_mapbox(tiendas_df, center=go.layout.mapbox.Center(lat=center_lat, lon=center_lon), 
+      lat='latitude', 
+      lon='longitude',   
+      color="lealtad", 
+      color_continuous_scale=px.colors.cyclical.IceFire, 
+      hover_name="Nombre Tienda", 
+      size_max=100, zoom=18
+      )
            
     return fig_map
 
@@ -406,12 +443,7 @@ def grafico_mapa(input_tienda):
 #html.P(id='rec1-fabricante1'),
 
 @app.callback(
-    [    
-        Output(component_id='rec1-subcategoria1',component_property="children"),
-        Output(component_id='rec1-producto1',component_property="children"),
-        Output(component_id='rec1-fabricante1',component_property="children"),
-        Output(component_id='Tabla_top', component_property="children"),
-    ],
+    list_of_outputs_pop_prod,
     [
         Input(component_id="radio_tipo_top_products", component_property="value"),
     ],
@@ -426,12 +458,47 @@ def update_radio_top_products(input):
             df_temp = df_top_ventas_registros.copy()      
         
 
-    output1= "Subcategoria: "+ str(df_temp.loc[1,'NOMBRE SUB']).capitalize()
+    output1= "Subcategoria: "+ str(df_temp.loc[0,'NOMBRE SUB']).capitalize()
     output2= str(df_temp.loc[0,'Nombre Material']).capitalize()
-    output3= "Fabricante: " + str(df_temp.loc[1,'Nombre Fabricante']).capitalize()
+    output3= "Fabricante: " + str(df_temp.loc[0,'Nombre Fabricante']).capitalize()
 
-    
-    return output1, output2, output3,  dbc.Table.from_dataframe(df_temp.head(10), striped=True, bordered=True, size='sm', hover=True)
+    output4= "Subcategoria: "+ str(df_temp.loc[1,'NOMBRE SUB']).capitalize()
+    output5= str(df_temp.loc[1,'Nombre Material']).capitalize()
+    output6= "Fabricante: " + str(df_temp.loc[1,'Nombre Fabricante']).capitalize()
+
+    output7= "Subcategoria: "+ str(df_temp.loc[2,'NOMBRE SUB']).capitalize()
+    output8= str(df_temp.loc[2,'Nombre Material']).capitalize()
+    output9= "Fabricante: " + str(df_temp.loc[2,'Nombre Fabricante']).capitalize()
+
+    output10= "Subcategoria: "+ str(df_temp.loc[3,'NOMBRE SUB']).capitalize()
+    output11= str(df_temp.loc[3,'Nombre Material']).capitalize()
+    output12= "Fabricante: " + str(df_temp.loc[3,'Nombre Fabricante']).capitalize()
+
+    output13= "Subcategoria: "+ str(df_temp.loc[4,'NOMBRE SUB']).capitalize()
+    output14= str(df_temp.loc[4,'Nombre Material']).capitalize()
+    output15= "Fabricante: " + str(df_temp.loc[4,'Nombre Fabricante']).capitalize()
+
+    output16= "Subcategoria: "+ str(df_temp.loc[5,'NOMBRE SUB']).capitalize()
+    output17= str(df_temp.loc[5,'Nombre Material']).capitalize()
+    output18= "Fabricante: " + str(df_temp.loc[5,'Nombre Fabricante']).capitalize()
+
+    output19= "Subcategoria: "+ str(df_temp.loc[6,'NOMBRE SUB']).capitalize()
+    output20= str(df_temp.loc[6,'Nombre Material']).capitalize()
+    output21= "Fabricante: " + str(df_temp.loc[6,'Nombre Fabricante']).capitalize()
+
+    output22= "Subcategoria: "+ str(df_temp.loc[7,'NOMBRE SUB']).capitalize()
+    output23= str(df_temp.loc[7,'Nombre Material']).capitalize()
+    output24= "Fabricante: " + str(df_temp.loc[7,'Nombre Fabricante']).capitalize()
+
+    output25= "Subcategoria: "+ str(df_temp.loc[8,'NOMBRE SUB']).capitalize()
+    output26= str(df_temp.loc[8,'Nombre Material']).capitalize()
+    output27= "Fabricante: " + str(df_temp.loc[8,'Nombre Fabricante']).capitalize()
+
+    output28= "Subcategoria: "+ str(df_temp.loc[9,'NOMBRE SUB']).capitalize()
+    output29= str(df_temp.loc[9,'Nombre Material']).capitalize()
+    output30= "Fabricante: " + str(df_temp.loc[9,'Nombre Fabricante']).capitalize()
+
+    return output1, output2, output3, output4, output5, output6, output7, output8, output9, output10, output11, output12, output13, output14, output15, output16, output17, output18, output19, output20, output21, output22, output23, output24, output25, output26, output27, output28, output29, output30, dbc.Table.from_dataframe(df_temp.head(10), striped=True, bordered=True, size='sm', hover=True)
             
 
 
