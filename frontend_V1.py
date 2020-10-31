@@ -128,7 +128,7 @@ lista3=  dbc.Row(
   dbc.Col(lista_cards2[8]),
   dbc.Col(lista_cards2[9]),
   ],
-  className="mb-2_1",)
+  className="mb-2_2",)
 
 br = html.Br()
 
@@ -391,9 +391,6 @@ def grafico_categorias_tienda_cluster(input_tienda,filtro):
         title=Nombre_Tienda,
     )
     
-    #fig_cat_tienda.show()
-    
-    
     return fig_cat_tienda_cluster
 
 
@@ -413,7 +410,7 @@ def grafico_mapa(input_tienda):
     #center_lat = tiendas_df.latitude.mean()
     #center_lon = tiendas_df.longitude.mean()
     
-    tiendas_df = df[['longitude','latitude','lealtad','Tienda','Nombre Tienda']].groupby('Nombre Tienda', as_index=False).max()
+    tiendas_df = df[['longitude','latitude','lealtad','Tienda','Nombre Tienda']].groupby('Tienda', as_index=False).max()
     print(input_tienda)
     center_lat = tiendas_df[tiendas_df['Tienda'] == int(input_tienda)]['latitude'].mean()
     center_lon = tiendas_df[tiendas_df['Tienda'] == int(input_tienda)]['longitude'].mean()
