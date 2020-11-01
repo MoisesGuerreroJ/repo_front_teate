@@ -166,7 +166,7 @@ app.layout = html.Div(children=[
            dbc.Col(
            
                #Titulo
-               html.H2(className="h2-title", children="DS4A: Teate Project. Team 45 Dashboard Web App"),
+               html.H2(className="h2-title", children="Tea-té Recomienda"),
                
            width={"sm": '12', "order": "first"}), # Fin de la columna 1 del banner : Texto
                
@@ -405,18 +405,10 @@ def grafico_categorias_tienda_cluster(input_tienda,filtro):
     ],
 )
 def grafico_mapa(input_tienda):
-    
-    #tiendas_df = df[df['Region']=='region cali'][['longitude','latitude','lealtad','Nombre Tienda']].groupby('Nombre Tienda', as_index=False).max()
-    #center_lat = tiendas_df.latitude.mean()
-    #center_lon = tiendas_df.longitude.mean()
-    
     tiendas_df = df[['longitude','latitude','lealtad','Tienda','Nombre Tienda']].groupby('Tienda', as_index=False).max()
-    print(input_tienda)
     center_lat = tiendas_df[tiendas_df['Tienda'] == int(input_tienda)]['latitude'].mean()
     center_lon = tiendas_df[tiendas_df['Tienda'] == int(input_tienda)]['longitude'].mean()
 
-    print(center_lat, ',', center_lon)
-    
     map_box_access_token = "pk.eyJ1IjoiaHVtYmVydG9jcnYiLCJhIjoiY2tnbG5xZWpyMTJhdzJycGVyamZma2FjYyJ9.juzkmatkYaLTmiprDJCD0w"
     px.set_mapbox_access_token(map_box_access_token)
     fig_map = px.scatter_mapbox(tiendas_df, center=go.layout.mapbox.Center(lat=center_lat, lon=center_lon), 
@@ -430,14 +422,6 @@ def grafico_mapa(input_tienda):
            
     return fig_map
 
-
-
-
-
-#-------------------------------------------------------------------------------------------!!!!!!!!!!!!!!!!!!!!
-#html.H5(id='rec1-subcategoria1'),
-#html.H6(id='rec1-producto1'),
-#html.P(id='rec1-fabricante1'),
 
 @app.callback(
     list_of_outputs_pop_prod,
