@@ -11,6 +11,7 @@ from dash.dependencies import Input, Output
 
 #################### START OF "app" ########################
 app = dash.Dash(__name__,external_stylesheets=[dbc.themes.BOOTSTRAP])
+app.config.suppress_callback_exceptions = True
 
 # the style arguments for the sidebar. We use position:fixed and a fixed width
 SIDEBAR_STYLE = {
@@ -44,7 +45,8 @@ mini_container = {
 
 ######################### DATA ##########################
 df_tiendas_mapa = pd.read_csv("Tiendas_mapa.csv")
-
+# It's necessary to convert "cluster" column to categorical variable
+df_tiendas_mapa['cluster'] = df_tiendas_mapa['cluster'].astype('str')
 
 ######################### SIDEBAR LAYOUT ############################
 sidebar = html.Div(
@@ -197,17 +199,17 @@ def render_page_content(pathname):
 )
 
 def grafico_mapa(input_tienda):
-    tiendas_df = df_tiendas_mapa[['longitude','latitude','Tienda','Nombre Tienda']]
-    center_lat = tiendas_df[tiendas_df['Tienda'] == int(input_tienda)]['latitude']
-    center_lon = tiendas_df[tiendas_df['Tienda'] == int(input_tienda)]['longitude']
+    tiendas_df = df_tiendas_mapa.groupby('Tienda', as_index=False).max()
+    center_lat = tiendas_df[tiendas_df['Tienda'] == int(input_tienda)]['latitude'].mean()
+    center_lon = tiendas_df[tiendas_df['Tienda'] == int(input_tienda)]['longitude'].mean()
 
     map_box_access_token = "pk.eyJ1IjoiaHVtYmVydG9jcnYiLCJhIjoiY2tnbG5xZWpyMTJhdzJycGVyamZma2FjYyJ9.juzkmatkYaLTmiprDJCD0w"
     px.set_mapbox_access_token(map_box_access_token)
     fig_map = px.scatter_mapbox(tiendas_df, center=go.layout.mapbox.Center(lat=center_lat, lon=center_lon), 
         lat='latitude', 
         lon='longitude',
-        #color="lealtad",
-        #color_continuous_scale=px.colors.cyclical.IceFire,
+        color="cluster",
+        color_continuous_scale=px.colors.cyclical.IceFire,
         hover_name="Nombre Tienda",
         size_max=100,
         zoom=18
