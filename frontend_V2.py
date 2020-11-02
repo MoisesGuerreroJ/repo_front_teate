@@ -48,6 +48,9 @@ df_tiendas_mapa = pd.read_csv("Tiendas_mapa.csv")
 # It's necessary to convert "cluster" column to categorical variable
 df_tiendas_mapa['cluster'] = df_tiendas_mapa['cluster'].astype('str')
 
+dropdown_dict = [{"label": str(i)+' - '+str(df_tiendas_mapa[df_tiendas_mapa['Tienda'] == i]['Nombre Tienda'].\
+    iloc[0]).upper(),"value":str(i)} for i in df_tiendas_mapa['Tienda'].unique()]
+
 ######################### SIDEBAR LAYOUT ############################
 sidebar = html.Div(
     [
@@ -79,15 +82,15 @@ homepage_layout = html.Div(
     html.Div(className='jumbotron',
         children=[html.Div(id="error-message"),
         dbc.Row([
+            # dbc.Col(
+            #     html.H6(className="h2-title", children="Tea-té Recomienda")
+            #     ),
             dbc.Col(
-                html.H2(className="h2-title", children="Tea-té Recomienda")
-                ),
-            dbc.Col(
-                html.Img(className="Imagen_logo_1",
-                    src="https://teate.co/wp-content/themes/teatetheme/images/logo.png",
-                    style={'height':'5%','align':'left'})
-                ),
-            ], justify='around', align='center'),
+               html.Img(className="Imagen_logo_1",
+                   src="https://drive.google.com/file/d/1xIwoIyedfzKssINXA1vZrzUZqoUcuCu1/",
+                   style={'height':'5%','align':'left'})
+               ),
+            ], align='center'),
         ]),
     dbc.Container([
         html.H4('Subcategorias más populares'),
@@ -129,9 +132,7 @@ homepage_layout = html.Div(
                 html.H5('Seleccione Tienda:'),
                 dcc.Dropdown(
                     id='dropdown_tienda',
-                    #options=dropdown_dict,
-                    options=[{'label':'20000541','value':'20000541'},
-                            {'label':'20000542','value':'20000542'}],
+                    options=dropdown_dict,
                     value='20000541',
                     #placeholder="Seleccione cód tienda"
                     ),
@@ -205,7 +206,7 @@ def grafico_mapa(input_tienda):
 
     map_box_access_token = "pk.eyJ1IjoiaHVtYmVydG9jcnYiLCJhIjoiY2tnbG5xZWpyMTJhdzJycGVyamZma2FjYyJ9.juzkmatkYaLTmiprDJCD0w"
     px.set_mapbox_access_token(map_box_access_token)
-    fig_map = px.scatter_mapbox(tiendas_df, center=go.layout.mapbox.Center(lat=center_lat, lon=center_lon), 
+    fig_map = px.scatter_mapbox(tiendas_df, center=go.layout.mapbox.Center(lat=center_lat, lon=center_lon),
         lat='latitude', 
         lon='longitude',
         color="cluster",

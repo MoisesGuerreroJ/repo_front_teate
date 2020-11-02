@@ -21,7 +21,7 @@ import os
 
 
 df_orig = pd.read_csv("datos_con_coordenadas_v1 (1).csv", compression='gzip', low_memory=False)
-df = df_orig.copy() 
+df = df_orig.copy()
 
 def set_mes_number(x):
     mes_dic = {'Enero 2019':1, 'Abril 2019':4, 'Mayo 2019':5, 'Noviembre 2019':11,
@@ -398,8 +398,6 @@ def grafico_categorias_tienda_cluster(input_tienda,filtro):
 @app.callback(
     
         Output(component_id="grafico_3",component_property="figure"),
-
-    
     [
         Input(component_id="dropdown_tienda", component_property="value"),
     ],
