@@ -48,8 +48,13 @@ df_tiendas_mapa = pd.read_csv("Tiendas_mapa.csv")
 # It's necessary to convert "cluster" column to categorical variable
 df_tiendas_mapa['cluster'] = df_tiendas_mapa['cluster'].astype('str')
 
-dropdown_dict = [{"label": str(i)+' - '+str(df_tiendas_mapa[df_tiendas_mapa['Tienda'] == i]['Nombre Tienda'].\
-    iloc[0]).upper(),"value":str(i)} for i in df_tiendas_mapa['Tienda'].unique()]
+recomendacion = pd.read_excel('Recomendacion.xlsx')
+print(recomendacion)
+
+# dropdown_dict = [{"label": str(i)+' - '+str(df_tiendas_mapa[df_tiendas_mapa['Tienda'] == i]['Nombre Tienda'].\
+#     iloc[0]).upper(),"value":str(i)} for i in df_tiendas_mapa['Tienda'].unique()]
+
+dropdown_dict = [{"label":str(i), "value":str(i)} for i in recomendacion['usuario'].unique()]
 
 ######################### SIDEBAR LAYOUT ############################
 sidebar = html.Div(
@@ -126,11 +131,12 @@ homepage_layout = html.Div(
                 dcc.Dropdown(
                     id='dropdown_tienda',
                     options=dropdown_dict,
-                    value='20000541',
-                    #placeholder="Seleccione cód tienda"
+                    #value='20000541',
+                    placeholder="Seleccione Tienda"
                     ),
                 ],style=mini_container,width=4),
             dbc.Col([
+                html.Div(id='Tabla_recomendaciones', children=[])
                 ],style=mini_container),
             ]),
         dbc.Row([
@@ -185,6 +191,27 @@ def render_page_content(pathname):
 
 ################## CALLBACKS HOMEPAGE ###################
 
+### Callback tabla recomendación
+
+@app.callback(
+    Output(component_id="Tabla_recomendaciones",component_property="children"),
+    [
+    Input(component_id="dropdown_tienda", component_property="value")
+    ]
+)
+
+def actualizar_tabla_recomendaciones(input_tienda):
+    recomendacion_1 = recomendacion.copy()
+    recomendacion_1 = recomendacion_1[recomendacion_1['usuario'] == int(input_tienda)][['Tipo R',0,1,2,3,4,5,6,7,8,9]]
+    recomendacion_1 = recomendacion_1.set_index('Tipo R').T
+
+    return dbc.Table.from_dataframe(recomendacion_1,
+     striped=True, 
+     bordered=True, 
+     size='0.5sm', 
+     hover=True)
+
+### Callback mapa
 @app.callback(
     Output(component_id="mapa_tiendas",component_property="figure"),
     [
