@@ -87,10 +87,10 @@ homepage_layout = html.Div(
             #     ),
             dbc.Col(
                html.Img(className="Imagen_logo_1",
-                   src="https://drive.google.com/file/d/1xIwoIyedfzKssINXA1vZrzUZqoUcuCu1/",
-                   style={'height':'5%','align':'left'})
+                   src="https://static.wixstatic.com/media/c6e056_02725f5e9e344faa9360e00d78eff6de~mv2.png",
+                   style={'height':'70%','align':'left'})
                ),
-            ], align='center'),
+            ], align='left'),
         ]),
     dbc.Container([
         html.H4('Subcategorias más populares'),
