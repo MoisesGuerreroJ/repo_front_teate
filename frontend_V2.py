@@ -136,32 +136,38 @@ homepage_layout = html.Div(
         ),
         dbc.Row([
             dbc.Col([
-                dbc.Row([
-                    html.H5('Seleccione Región:'),
-                    dcc.RadioItems(
-                        options=[
-                        {'label': 'REGIÓN CALI', 'value': 'REGION CALI'},
-                        {'label': 'REGIÓN MEDELLÍN', 'value': 'REGION MEDELLIN'},
-                        ],value='REGION CALI', labelStyle={'display': 'block'}
+                html.H5('Seleccione Región:'),
+                dcc.RadioItems(
+                    options=[
+                    {'label': 'REGIÓN CALI', 'value': 'REGION CALI'},
+                    {'label': 'REGIÓN MEDELLÍN', 'value': 'REGION MEDELLIN'},
+                    ],value='REGION CALI', labelStyle={'display': 'block'}
                     ),
-                    html.Br(),
-                    html.H5('Seleccione Tienda:'),
-                    dcc.Dropdown(
-                        id='dropdown_tienda',
-                        options=dropdown_dict,
-                        #value='20000541',
-                        placeholder="Seleccione Tienda"
-                        ),
-                    ],style=mini_container),
-                dbc.Row([
-                    html.Center(children=[  
-                        dcc.Graph(id='mapa_tiendas', figure={}),
-                        ])
-                    ],style=mini_container,width=4),
-                ]),
-            
+                html.Br(),
+                html.H5('Seleccione Tienda:'),
+                dcc.Dropdown(
+                    id='dropdown_tienda',
+                    options=dropdown_dict,
+                    #value='20000541',
+                    placeholder="Seleccione Tienda"
+                    ),
+                ],style=mini_container,width=4),
             dbc.Col([
                 html.Div(id='Tabla_recomendaciones', children=[])
+                ],style=mini_container),
+            ]),
+        dbc.Row([
+            dbc.Col([
+                dbc.Card([
+                dbc.CardHeader([html.H6("Aseo", className="card-title")]),
+                dbc.CardBody([
+                    html.P("Fabricante: JGB", className="card-text"),
+                    ])],style={"width": "10"}, color='info', outline=True),
+                ],style=mini_container,width=3),
+            dbc.Col([
+                html.Center(children=[  
+                    dcc.Graph(id='mapa_tiendas', figure={}),
+                    ]),
                 ],style=mini_container),
             ]),
         ]),
