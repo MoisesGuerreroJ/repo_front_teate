@@ -44,12 +44,17 @@ mini_container = {
 
 
 ######################### DATA ##########################
+df_orig = pd.read_csv('datos_con_coordenadas_v1 (1).csv', compression='gzip')
+df = df_orig.copy()
+
 df_tiendas_mapa = pd.read_csv("Tiendas_mapa.csv")
 # It's necessary to convert "cluster" column to categorical variable
 df_tiendas_mapa['cluster'] = df_tiendas_mapa['cluster'].astype('str')
 
 recomendacion = pd.read_excel('Recomendacion.xlsx')
-print(recomendacion)
+
+for col in recomendacion.columns[2:]:
+    recomendacion[col]=recomendacion[col].apply(lambda x: df[df['Material']==x]['Nombre Material'].max())
 
 # dropdown_dict = [{"label": str(i)+' - '+str(df_tiendas_mapa[df_tiendas_mapa['Tienda'] == i]['Nombre Tienda'].\
 #     iloc[0]).upper(),"value":str(i)} for i in df_tiendas_mapa['Tienda'].unique()]
@@ -79,31 +84,43 @@ sidebar = html.Div(
 content = html.Div(id="page-content", style=CONTENT_STYLE)
 app.layout = html.Div([dcc.Location(id="url"), sidebar, content])
 
-########################### FIRST PAGE LAYOUT ######################
+########################### FIRST PAGE LAYOUT ########################
 # Here we have all the content of the homepage
 
 homepage_layout = html.Div(
     children=[
     html.Div(className='jumbotron',
         children=[html.Div(id="error-message"),
-        html.Img(className="Imagen_logo_1",
-            src="https://static.wixstatic.com/media/c6e056_02725f5e9e344faa9360e00d78eff6de~mv2.png",
-            style={'size':'20rem','align':'left'})],
-        ),
+        dbc.Row([
+            # dbc.Col(
+            #     html.H6(className="h2-title", children="Tea-té Recomienda")
+            #     ),
+            dbc.Col(
+               html.Img(className="Imagen_logo_1",
+                   src="https://static.wixstatic.com/media/c6e056_02725f5e9e344faa9360e00d78eff6de~mv2.png",
+                   style={'height':'100%','align':'left'})
+               ),
+            ], align='left'),
+        ]),
     dbc.Container([
-        html.H4('Subcategorias más populares'),
+        html.H4('Subcategorias populares'),
         dtc.Carousel([
-            html.Div('slide 1',style=mini_container),
-            dbc.Card([
-                dbc.CardHeader([html.H6("Aseo", className="card-title")]),
-                dbc.CardBody([
-                    html.P("Fabricante: JGB", className="card-text"),
-                    ])],style={"width": "10"}, color='info', outline=True),
-            html.Div('slide 2',style=mini_container),
-            html.Div('slide 3',style=mini_container),
-            html.Div('slide 4',style=mini_container),
-            html.Div('slide 5',style=mini_container),
-            html.Div('slide 6',style=mini_container)
+            html.Img(className="Imagen_slider1",
+                   src="https://static.wixstatic.com/media/e9606e_52e15af7d9b54c4ca1b51a67e4abb8f3~mv2.png"),
+            html.Img(className="Imagen_slider2",
+                   src="https://static.wixstatic.com/media/e9606e_3057be61ba094ba684ac33e852ff4702~mv2.png"),
+            html.Img(className="Imagen_slider3",
+                   src="https://static.wixstatic.com/media/e9606e_a01463d424f8451b93e125b093aa2a71~mv2.png"),
+            html.Img(className="Imagen_slider4",
+                   src="https://static.wixstatic.com/media/e9606e_0c228475e917406f9367b43a79ffdf6d~mv2.png"),
+            html.Img(className="Imagen_slider5",
+                   src="https://static.wixstatic.com/media/e9606e_7f2dde5a4cc541859bdf5599d4b2562d~mv2.png"),
+            html.Img(className="Imagen_slider6",
+                   src="https://static.wixstatic.com/media/e9606e_adf6f666ace4425f9aca6cdf6dd0c732~mv2.png"),
+            html.Img(className="Imagen_slider7",
+                   src="https://static.wixstatic.com/media/e9606e_a01463d424f8451b93e125b093aa2a71~mv2.png"),
+            html.Img(className="Imagen_slider8",
+                   src="https://static.wixstatic.com/media/e9606e_a01463d424f8451b93e125b093aa2a71~mv2.png"),            
         ],
             slides_to_scroll=1,
             swipe_to_slide=True,
@@ -119,38 +136,32 @@ homepage_layout = html.Div(
         ),
         dbc.Row([
             dbc.Col([
-                html.H5('Seleccione Región:'),
-                dcc.RadioItems(
-                    options=[
-                    {'label': 'REGIÓN CALI', 'value': 'REGION CALI'},
-                    {'label': 'REGIÓN MEDELLÍN', 'value': 'REGION MEDELLIN'},
-                    ],value='REGION CALI', labelStyle={'display': 'block'}
+                dbc.Row([
+                    html.H5('Seleccione Región:'),
+                    dcc.RadioItems(
+                        options=[
+                        {'label': 'REGIÓN CALI', 'value': 'REGION CALI'},
+                        {'label': 'REGIÓN MEDELLÍN', 'value': 'REGION MEDELLIN'},
+                        ],value='REGION CALI', labelStyle={'display': 'block'}
                     ),
-                html.Br(),
-                html.H5('Seleccione Tienda:'),
-                dcc.Dropdown(
-                    id='dropdown_tienda',
-                    options=dropdown_dict,
-                    #value='20000541',
-                    placeholder="Seleccione Tienda"
-                    ),
-                ],style=mini_container,width=4),
+                    html.Br(),
+                    html.H5('Seleccione Tienda:'),
+                    dcc.Dropdown(
+                        id='dropdown_tienda',
+                        options=dropdown_dict,
+                        #value='20000541',
+                        placeholder="Seleccione Tienda"
+                        ),
+                    ],style=mini_container),
+                dbc.Row([
+                    html.Center(children=[  
+                        dcc.Graph(id='mapa_tiendas', figure={}),
+                        ])
+                    ],style=mini_container,width=4),
+                ]),
+            
             dbc.Col([
                 html.Div(id='Tabla_recomendaciones', children=[])
-                ],style=mini_container),
-            ]),
-        dbc.Row([
-            dbc.Col([
-                dbc.Card([
-                dbc.CardHeader([html.H6("Aseo", className="card-title")]),
-                dbc.CardBody([
-                    html.P("Fabricante: JGB", className="card-text"),
-                    ])],style={"width": "10"}, color='info', outline=True),
-                ],style=mini_container,width=3),
-            dbc.Col([
-                html.Center(children=[  
-                    dcc.Graph(id='mapa_tiendas', figure={}),
-                    ]),
                 ],style=mini_container),
             ]),
         ]),
@@ -208,7 +219,7 @@ def actualizar_tabla_recomendaciones(input_tienda):
     return dbc.Table.from_dataframe(recomendacion_1,
      striped=True, 
      bordered=True, 
-     size='0.5sm', 
+     size='md', 
      hover=True)
 
 ### Callback mapa
