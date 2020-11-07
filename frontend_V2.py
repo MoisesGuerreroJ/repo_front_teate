@@ -104,6 +104,7 @@ homepage_layout = html.Div(
         ]),
     dbc.Container([
         html.H4('Subcategorias populares'),
+        # ESTE ES EL SLIDER SUPERIOR, CADA ELEMENTO DEL SLIDER ES LA IMAGEN
         dtc.Carousel([
             html.Img(className="Imagen_slider1",
                    src="https://static.wixstatic.com/media/e9606e_52e15af7d9b54c4ca1b51a67e4abb8f3~mv2.png"),
@@ -133,8 +134,9 @@ homepage_layout = html.Div(
             'breakpoint': 991,
             'settings': {'arrows': False}
             }]
-        ),
+        ), # AQUI TERMINA EL SLIDER LA CONFIGURACIÓN SE DEJA TAL CUAL
         dbc.Row([
+            # COLUMNA DONDE ESTÁ LA SELECCIÓN DE REGIÓN Y TIENDA
             dbc.Col([
                 html.H5('Seleccione Región:'),
                 dcc.RadioItems(
@@ -152,10 +154,12 @@ homepage_layout = html.Div(
                     placeholder="Seleccione Tienda"
                     ),
                 ],style=mini_container,width=4),
+            # COLUMNA DONDE APARECE LA TABLA DE RECOMENDACIONES (REEMPLAZAR POR SLIDERS)
             dbc.Col([
                 html.Div(id='Tabla_recomendaciones', children=[])
                 ],style=mini_container),
             ]),
+        # NUEVA FILA DONDE ESTÁ EL BOX VACÍO Y EL MAPA
         dbc.Row([
             dbc.Col([
                 dbc.Card([
@@ -170,7 +174,7 @@ homepage_layout = html.Div(
                     ]),
                 ],style=mini_container),
             ]),
-        ]),
+        ]), # AQUI TERMINA LA SEGUNDA FILA DONDE ESTÁ EL MAPA
     ])
 ######################### CALLBACKS ###########################
 
