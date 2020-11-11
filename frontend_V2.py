@@ -7,6 +7,7 @@ import dash_trich_components as dtc
 import plotly.express as px
 import plotly.graph_objs as go
 import pandas as pd
+import random
 from dash.dependencies import Input, Output
 
 #################### START OF "app" ########################
@@ -44,9 +45,12 @@ mini_container = {
 
 
 ######################### DATA ##########################
-df_orig = pd.read_csv('datos_con_coordenadas_v1 (1).csv', compression='gzip')
-df = df_orig.copy()
 
+# Tabla principal Completa
+df_orig = pd.read_csv('datos_con_coordenadas_v1 (1).csv', compression='gzip')
+df = df_orig.copy() # Copia de la tabla original
+
+# 
 df_tiendas_mapa = pd.read_csv("Tiendas_mapa.csv")
 # It's necessary to convert "cluster" column to categorical variable
 df_tiendas_mapa['cluster'] = df_tiendas_mapa['cluster'].astype('str')
@@ -59,7 +63,50 @@ for col in recomendacion.columns[2:]:
 # dropdown_dict = [{"label": str(i)+' - '+str(df_tiendas_mapa[df_tiendas_mapa['Tienda'] == i]['Nombre Tienda'].\
 #     iloc[0]).upper(),"value":str(i)} for i in df_tiendas_mapa['Tienda'].unique()]
 
-dropdown_dict = [{"label":str(i), "value":str(i)} for i in recomendacion['usuario'].unique()]
+#dropdown_dict = [{"label":str(i)+' - '+str(df[df['Tienda'] == i]['Nombre Tienda'].iloc[0]),"value":str(i)} for i in recomendacion['usuario'].unique()]
+
+#Saltos de linea
+br = html.Br()
+
+#Función creación carrusel
+def crear_carousel(product_list):
+    list_colores = ['primary','secondary','info','success','warning','danger','dark']
+    carrusel = dtc.Carousel([
+        dbc.Container([dbc.Card([dbc.CardHeader(html.P('#1')),dbc.CardBody([html.P(product_list[0].upper(), className="card-title"),])],
+            style={"size": "8rem"}, color=random.choice(list_colores), outline=True)]),
+        dbc.Container([dbc.Card([dbc.CardHeader(html.P('#2')),dbc.CardBody([html.P(product_list[1].upper(), className="card-title"),])],
+            style={"size": "8rem"}, color=random.choice(list_colores), outline=True)]),
+        dbc.Container([dbc.Card([dbc.CardHeader(html.P('#3')),dbc.CardBody([html.P(product_list[2].upper(), className="card-title"),])],
+            style={"size": "8rem"}, color=random.choice(list_colores), outline=True)]),
+        dbc.Container([dbc.Card([dbc.CardHeader(html.P('#4')),dbc.CardBody([html.P(product_list[3].upper(), className="card-title"),])],
+            style={"size": "8rem"}, color=random.choice(list_colores), outline=True)]),
+        dbc.Container([dbc.Card([dbc.CardHeader(html.P('#5')),dbc.CardBody([html.P(product_list[4].upper(), className="card-title"),])],
+            style={"size": "8rem"}, color=random.choice(list_colores), outline=True)]),
+        dbc.Container([dbc.Card([dbc.CardHeader(html.P('#6')),dbc.CardBody([html.P(product_list[5].upper(), className="card-title"),])],
+            style={"size": "8rem"}, color=random.choice(list_colores), outline=True)]),
+        dbc.Container([dbc.Card([dbc.CardHeader(html.P('#7')),dbc.CardBody([html.P(product_list[6].upper(), className="card-title"),])],
+            style={"size": "8rem"}, color=random.choice(list_colores), outline=True)]),
+        dbc.Container([dbc.Card([dbc.CardHeader(html.P('#8')),dbc.CardBody([html.P(product_list[7].upper(), className="card-title"),])],
+            style={"size": "8rem"}, color=random.choice(list_colores), outline=True)]),
+        dbc.Container([dbc.Card([dbc.CardHeader(html.P('#9')),dbc.CardBody([html.P(product_list[8].upper(), className="card-title"),])], 
+            style={"size": "8rem"}, color=random.choice(list_colores), outline=True)]),
+        dbc.Container([dbc.Card([dbc.CardHeader(html.P('#10')),dbc.CardBody([html.P(product_list[9].upper(), className="card-title"),])],
+            style={"size": "8rem"}, color=random.choice(list_colores), outline=True)]),                                                               
+        ],
+        slides_to_scroll=1,
+        swipe_to_slide=True,
+        autoplay=True,
+        speed=500,
+        variable_width=False,
+        center_mode=False,
+        responsive=[
+        {
+        'breakpoint': 991,
+        'settings': {
+        'arrows': True
+        }
+        }])
+    return carrusel
 
 ######################### SIDEBAR LAYOUT ############################
 sidebar = html.Div(
@@ -140,23 +187,27 @@ homepage_layout = html.Div(
             dbc.Col([
                 html.H5('Seleccione Región:'),
                 dcc.RadioItems(
+                    id='selector_region',
                     options=[
                     {'label': 'REGIÓN CALI', 'value': 'REGION CALI'},
                     {'label': 'REGIÓN MEDELLÍN', 'value': 'REGION MEDELLIN'},
                     ],value='REGION CALI', labelStyle={'display': 'block'}
                     ),
-                html.Br(),
+                br,
                 html.H5('Seleccione Tienda:'),
                 dcc.Dropdown(
                     id='dropdown_tienda',
-                    options=dropdown_dict,
-                    #value='20000541',
+                    options=[],
                     placeholder="Seleccione Tienda"
                     ),
+                br,
+                html.Center(children=[  
+                    dcc.Graph(id='mapa_tiendas', figure={}),
+                    ]),
                 ],style=mini_container,width=4),
-            # COLUMNA DONDE APARECE LA TABLA DE RECOMENDACIONES (REEMPLAZAR POR SLIDERS)
+            # COLUMNA DONDE APARECEN LAS RECOMENDACIONES
             dbc.Col([
-                html.Div(id='Tabla_recomendaciones', children=[])
+                html.Div(id='area_recomendaciones', children=[])
                 ],style=mini_container),
             ]),
         # NUEVA FILA DONDE ESTÁ EL BOX VACÍO Y EL MAPA
@@ -170,7 +221,7 @@ homepage_layout = html.Div(
                 ],style=mini_container,width=3),
             dbc.Col([
                 html.Center(children=[  
-                    dcc.Graph(id='mapa_tiendas', figure={}),
+                    dcc.Graph(id='mapa_tiendas_', figure={}),
                     ]),
                 ],style=mini_container),
             ]),
@@ -213,24 +264,75 @@ def render_page_content(pathname):
 ################## CALLBACKS HOMEPAGE ###################
 
 ### Callback tabla recomendación
-
 @app.callback(
-    Output(component_id="Tabla_recomendaciones",component_property="children"),
     [
-    Input(component_id="dropdown_tienda", component_property="value")
+    Output(component_id="dropdown_tienda",component_property="options"),
+    Output(component_id="dropdown_tienda",component_property="value")
+    ],
+    [
+    Input(component_id="selector_region",component_property="value")
     ]
 )
 
-def actualizar_tabla_recomendaciones(input_tienda):
-    recomendacion_1 = recomendacion.copy()
-    recomendacion_1 = recomendacion_1[recomendacion_1['usuario'] == int(input_tienda)][['Tipo R',0,1,2,3,4,5,6,7,8,9]]
-    recomendacion_1 = recomendacion_1.set_index('Tipo R').T
+def actualizar_selec_region(region_s):
+    if str(region_s) == "REGION CALI":
+        df_temp = df.copy()
+        lista_cali = list(df_temp[df_temp['Region'] == 'region cali']['Tienda'].unique())
+        dropdown_dict = [{"label":str(i)+' - '+str(df[df['Tienda'] == i]['Nombre Tienda'].\
+            iloc[0]),"value":str(i)} for i in recomendacion[recomendacion['usuario'].isin(lista_cali)]['usuario'].unique()]
+        valor_default_tiendas = recomendacion[recomendacion['usuario'].isin(lista_cali)]['usuario'].unique()[0]
+        return dropdown_dict, valor_default_tiendas
+    elif str(region_s) == "REGION MEDELLIN":
+        df_temp = df.copy()
+        lista_medellin = list(df_temp[df_temp['Region'] == 'region medellin']['Tienda'].unique())
+        dropdown_dict = [{"label":str(i)+' - '+str(df[df['Tienda'] == i]['Nombre Tienda'].\
+            iloc[0]),"value":str(i)} for i in recomendacion[recomendacion['usuario'].isin(lista_medellin)]['usuario'].unique()]
+        valor_default_tiendas = recomendacion[recomendacion['usuario'].isin(lista_medellin)]['usuario'].unique()[0]
+        return dropdown_dict, valor_default_tiendas
 
-    return dbc.Table.from_dataframe(recomendacion_1,
-     striped=True, 
-     bordered=True, 
-     size='md', 
-     hover=True)
+
+@app.callback(
+    Output(component_id='area_recomendaciones', component_property="children"),
+    [
+    Input(component_id="dropdown_tienda", component_property="value"),
+    ],
+)
+
+def update_radio_rec_system(input_tienda):
+    #calculo de top productos mas pedidos por la tienda seleccionada
+    top_productos = df[df['Tienda']==int(input_tienda)][['Nombre Material','Pedido']].groupby(['Nombre Material'], as_index=False).count()
+    top_productos = top_productos.sort_values(by='Pedido', ascending=False).reset_index().head(10)
+    top_productos = top_productos['Nombre Material'].tolist()
+
+    list_custom = recomendacion[(recomendacion['usuario']==int(input_tienda)) & (recomendacion['Tipo R']=='Custom')]
+    list_custom = list_custom.iloc[0,2:].tolist()
+    list_custom = [x.capitalize() for x in list_custom]
+    
+    list_region = recomendacion[(recomendacion['usuario']==int(input_tienda)) & (recomendacion['Tipo R']=='Region')]
+    list_region = list_region.iloc[0,2:].tolist()
+    list_region = [x.capitalize() for x in list_region]
+    
+    list_cluster = recomendacion[(recomendacion['usuario']==int(input_tienda)) & (recomendacion['Tipo R']=='Cluster')]
+    list_cluster = list_cluster.iloc[0,2:].tolist()
+    list_cluster = [x.capitalize() for x in list_cluster]
+
+    
+    tablas_rec = html.Div(children=[
+        html.H4(className="h4-title", children="Productos más comprados por ti", style={'font-weight':'bold'}),
+        #dbc.Table.from_dataframe(top_productos, striped=True, bordered=True, size='sm', hover=True, dark=True),
+        crear_carousel(top_productos), br,
+
+        html.H4(className="h4-title", children="Recomendados especiales para ti", style={'font-weight':'bold'}),
+        crear_carousel(list_custom),
+
+        html.H4(className="h4-title", children="Productos comprados por usuarios parecidos a tí", style={'font-weight':'bold'}),
+        crear_carousel(list_cluster), br,
+
+        html.H4(className="h4-title", children="Productos más populares en tu región", style={'font-weight':'bold'}),
+        crear_carousel(list_region), br,
+        ])
+
+    return tablas_rec
 
 ### Callback mapa
 @app.callback(
