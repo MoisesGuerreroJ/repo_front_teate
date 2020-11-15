@@ -70,28 +70,27 @@ br = html.Br()
 
 #Función creación carrusel
 def crear_carousel(product_list):
-    list_colores = ['primary','secondary','info','success','warning','danger','dark']
     carrusel = dtc.Carousel([
         dbc.Container([dbc.Card([dbc.CardBody([html.H6('#1'),html.P(product_list[0].upper(),style={'fontSize':11}, className="card-title"),])],
-            style={"size": "8rem"}, color=random.choice(list_colores), inverse=True)]),
+            style={"size": "8rem","height":"100px","width":"200px"}, color='secondary', outline=True)]),
         dbc.Container([dbc.Card([dbc.CardBody([html.H6('#2'),html.P(product_list[1].upper(),style={'fontSize':11}, className="card-title"),])],
-            style={"size": "8rem"}, color=random.choice(list_colores), inverse=True)]),
+            style={"size": "8rem","height":"100px","width":"200px"}, color='secondary', outline=True)]),
         dbc.Container([dbc.Card([dbc.CardBody([html.H6('#3'),html.P(product_list[2].upper(),style={'fontSize':11}, className="card-title"),])],
-            style={"size": "8rem"}, color=random.choice(list_colores), inverse=True)]),
+            style={"size": "8rem","height":"100px","width":"200px"}, color='secondary', outline=True)]),
         dbc.Container([dbc.Card([dbc.CardBody([html.H6('#4'),html.P(product_list[3].upper(),style={'fontSize':11}, className="card-title"),])],
-            style={"size": "8rem"}, color=random.choice(list_colores), inverse=True)]),
+            style={"size": "8rem","height":"100px","width":"200px"}, color='secondary', outline=True)]),
         dbc.Container([dbc.Card([dbc.CardBody([html.H6('#5'),html.P(product_list[4].upper(),style={'fontSize':11}, className="card-title"),])],
-            style={"size": "8rem"}, color=random.choice(list_colores), inverse=True)]),
+            style={"size": "8rem","height":"100px","width":"200px"}, color='secondary', outline=True)]),
         dbc.Container([dbc.Card([dbc.CardBody([html.H6('#6'),html.P(product_list[5].upper(),style={'fontSize':11}, className="card-title"),])],
-            style={"size": "8rem"}, color=random.choice(list_colores), inverse=True)]),
+            style={"size": "8rem","height":"100px","width":"200px"}, color='secondary', outline=True)]),
         dbc.Container([dbc.Card([dbc.CardBody([html.H6('#7'),html.P(product_list[6].upper(),style={'fontSize':11}, className="card-title"),])],
-            style={"size": "8rem"}, color=random.choice(list_colores), inverse=True)]),
+            style={"size": "8rem","height":"100px","width":"200px"}, color='secondary', outline=True)]),
         dbc.Container([dbc.Card([dbc.CardBody([html.H6('#8'),html.P(product_list[7].upper(),style={'fontSize':11}, className="card-title"),])],
-            style={"size": "8rem"}, color=random.choice(list_colores), inverse=True)]),
+            style={"size": "8rem","height":"100px","width":"200px"}, color='secondary', outline=True)]),
         dbc.Container([dbc.Card([dbc.CardBody([html.H6('#9'),html.P(product_list[8].upper(),style={'fontSize':11}, className="card-title"),])], 
-            style={"size": "8rem"}, color=random.choice(list_colores), inverse=True)]),
+            style={"size": "8rem","height":"100px","width":"200px"}, color='secondary', outline=True)]),
         dbc.Container([dbc.Card([dbc.CardBody([html.H6('#10'),html.P(product_list[9].upper(),style={'fontSize':11}, className="card-title"),])],
-            style={"size": "8rem"}, color=random.choice(list_colores), inverse=True)]),                                                               
+            style={"size": "8rem","height":"100px","width":"200px"}, color='secondary', outline=True)]),                                                               
         ],
         slides_to_scroll=1,
         swipe_to_slide=True,
@@ -208,21 +207,6 @@ homepage_layout = html.Div(
             # COLUMNA DONDE APARECEN LAS RECOMENDACIONES
             dbc.Col([
                 html.Div(id='area_recomendaciones', children=[])
-                ],style=mini_container),
-            ]),
-        # NUEVA FILA DONDE ESTÁ EL BOX VACÍO Y EL MAPA
-        dbc.Row([
-            dbc.Col([
-                dbc.Card([
-                dbc.CardHeader([html.H6("Aseo", className="card-title")]),
-                dbc.CardBody([
-                    html.P("Fabricante: JGB", className="card-text"),
-                    ])],style={"width": "10"}, color='info', outline=True),
-                ],style=mini_container,width=3),
-            dbc.Col([
-                html.Center(children=[  
-                    dcc.Graph(id='mapa_tiendas_', figure={}),
-                    ]),
                 ],style=mini_container),
             ]),
         ]), # AQUI TERMINA LA SEGUNDA FILA DONDE ESTÁ EL MAPA
